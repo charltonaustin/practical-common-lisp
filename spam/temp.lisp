@@ -13,10 +13,12 @@
   (setf *total-hams* 0))
 
 (defun classification (score)
-  (cond
-    ((<= score *max-ham-score*) 'ham)
-    ((>= score *min-spam-score*) 'spam)
-    (t 'unsure)))
+  (values
+   (cond
+     ((<= score *max-ham-score*) 'ham)
+     ((>= score *min-spam-score*) 'spam)
+     (t 'unsure))
+   ))
 
 (defclass word-feature ()
   ((word
@@ -36,7 +38,7 @@
     :documentation "Number of hams we have seen this feature in.")))
 
 
-(Defun classify (text)
+(defun classify (text)
     (classification (score (extract-features text))))
 
 (defun intern-feature (word)
@@ -57,7 +59,6 @@
   (print-unreadable-object (object stream :type t)
     (with-slots (word ham-count spam-count) object
       (format stream "~s :hams ~d :spams ~d" word ham-count spam-count))))
-
 
 (defun train (text type)
   (dolist (feature (extract-features text))
@@ -92,7 +93,7 @@
 
 (defun score (features)
   (let ((spam-probs ()) (ham-probs ()) (number-of-probs 0))
-    (do-list (feature features)
+    (dolist (feature features)
       (unless (untrained-p feature)
         (let ((spam-prob (float (bayesian-spam-probability feature) 0.0d0)))
           (push spam-prob spam-probs)
@@ -109,5 +110,14 @@
 (defun fisher (probs number-of-probs)
   "The Fisher computation described by Robinson."
   (inverse-chi-square
-   (* -2 (log (reduce #'+ probs :key #'log)))
+   (* -2 (reduce #'+ probs :key #'log))
    (* 2 number-of-probs)))
+
+(defun inverse-chi-square (value degrees-of-freedom)
+  (assert (evenp degrees-of-freedom))
+  (min
+   (loop with m = (/ value 2)
+         for i below (/ degrees-of-freedom 2)
+         for prob = (exp (- m)) then (* prob (/ m i))
+         summing prob)
+   1.0))
