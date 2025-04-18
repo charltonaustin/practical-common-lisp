@@ -137,3 +137,28 @@
          (train-on (floor (* size (- 1 testing-fraction)))))
     (train-from-corpus shuffled :start 0 :end train-on)
     (test-from-corpus shuffled :start train-on)))
+
+(defparameter *max-chars* (* 10 2024))
+
+(defun train-from-corpus (corpus &key (start 0) end)
+  (loop for idx from start below (or end (length corpus)) do
+        (destructuring-bind (file type) (aref corpus idx)
+          (train (start-of-file file *max-chars*) type))))
+
+(defun test-from-corpus (corpus &key (start 0) end)
+  (loop for idx from start below (or end (length corpus)) collect
+        (destructuring-bind (file type) (aref corpus idx)
+          (multiple-value-bind (classification score)
+              (classify (start-of-file file *max-chars*))
+            (list
+             :file file
+             :type type
+             :classification classification
+             :score score)))))
+
+(defun nshuffle-vector (vector)
+  (loop for idx downfrom (1- (length vector)) to 1
+        for other = (random (1+ idx))
+        do (unless (= idx other)
+             (rotate (aref vector idx) (aref vector other))))
+        vector)
