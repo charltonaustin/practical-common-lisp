@@ -9,7 +9,7 @@
    (not (component-present-p (pathname-type p)))
    p))
 
-(defun pahtname-as-directory (name)
+(defun pathname-as-directory (name)
   (let ((pathname (pathname name)))
     (when (wild-pathname-p pathname)
       (error "Can't reliably convert wild pathnames."))
@@ -26,7 +26,7 @@
   (make-pathname
    :name :wild
    :type #-clisp :wild #+clisp nil
-   :defaults (pahtname-as-directory dirname)))
+   :defaults (pathname-as-directory dirname)))
 
 
 (defun list-directory (dirname)
