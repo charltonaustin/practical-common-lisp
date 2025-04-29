@@ -2,6 +2,10 @@
 
 (defun as-keyword (sym) (intern (string sym) :keyword))
 
+
+(defconstant +null+ (code-char 0))
+
+
 (defun slot->defclass-slot (spec)
   (let ((name (first spec)))
     `(,name :initarg ,(as-keyword name) :accessor ,name)))
