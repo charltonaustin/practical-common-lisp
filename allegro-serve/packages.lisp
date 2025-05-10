@@ -1,4 +1,4 @@
-(defpackage :com.charltonaustin.url-function-system (:use :asdf :cl :aserve :spinneret))
+(defpackage :com.charltonaustin.url-function-system (:use :asdf :cl :net.aserve :spinneret :com.charltonaustin.macro-utilities))
 (in-package :com.charltonaustin.url-function-system)
 
 (defsystem url-function
@@ -12,4 +12,9 @@
   :components
   ((:file "packages")
    (:file "html-infrastructure" :depends-on ("packages")))
-  :depends-on (:html :macro-utilities :aserve :spinneret))
+  :depends-on (:html :macro-utilities :net.aserve :spinneret))
+
+;; (ql:quickload :zaserve)
+;; (ql:quickload :spinneret)
+;; compile ./macro-utilities/packages.lisp
+;; compile ./macro-utilities/macro-utilities.lisp
