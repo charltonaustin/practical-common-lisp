@@ -11,4 +11,3 @@
            :parent-of-type
            :current-binary-object
            :+null+))
-
